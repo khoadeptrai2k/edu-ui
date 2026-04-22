@@ -62,13 +62,19 @@ function App() {
     }
   }, []);
 
-  // 🔥 PEERJS (FIX CONFIG)
   useEffect(() => {
+    const isProd = !!process.env.REACT_APP_PEERJS_HOST;
+
     const newPeer = new Peer(undefined, {
-      host: process.env.REACT_APP_PEERJS_HOST || "localhost",
-      port: 9090,
-      path: "/peerjs",
-      secure: false,
+      host: isProd
+        ? process.env.REACT_APP_PEERJS_HOST
+        : "localhost",
+
+      port: isProd ? undefined : 9090,
+
+      path: "/",
+
+      secure: isProd,
     });
 
     dispatch({ type: GLOBALTYPES.PEER, payload: newPeer });

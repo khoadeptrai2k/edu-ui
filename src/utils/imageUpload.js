@@ -23,10 +23,10 @@ export const imageUpload = async (images) => {
             formData.append("file", item)
         }
         
-        formData.append("upload_preset", "efxjficn")
-        formData.append("cloud_name", "EduSocial-channel")
+        formData.append("upload_preset", "zjzvsz6g")
+        formData.append("cloud_name", "khoa3112000")
 
-        const res = await fetch("https://api.cloudinary.com/v1_1/EduSocial-channel/upload", {
+        const res = await fetch("https://api.cloudinary.com/v1_1/khoa3112000/upload", {
             method: "POST",
             body: formData
         })

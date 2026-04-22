@@ -1,7 +1,5 @@
-/** @format */
-
 import { useEffect } from "react";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import PageRender from "./customRouter/PageRender";
 import PrivateRouter from "./customRouter/PrivateRouter";
@@ -34,7 +32,7 @@ function App() {
   useEffect(() => {
     dispatch(refreshToken());
 
-    const socket = io();
+    const socket = io(process.env.REACT_APP_SOCKET_URL);
     dispatch({ type: GLOBALTYPES.SOCKET, payload: socket });
     return () => socket.close();
   }, [dispatch]);
@@ -80,11 +78,26 @@ function App() {
           {auth.token && <SocketClient />}
           {call && <CallModal />}
 
-          <Route exact path="/" component={auth.token ? Home : Login} />
-          <Route exact path="/register" component={Register} />
-
-          <PrivateRouter exact path="/:page" component={PageRender} />
-          <PrivateRouter exact path="/:page/:id" component={PageRender} />
+          <Routes>
+            <Route path="/" element={auth.token ? <Home /> : <Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route
+              path="/:page"
+              element={
+                <PrivateRouter>
+                  <PageRender />
+                </PrivateRouter>
+              }
+            />
+            <Route
+              path="/:page/:id"
+              element={
+                <PrivateRouter>
+                  <PageRender />
+                </PrivateRouter>
+              }
+            />
+          </Routes>
         </div>
       </div>
     </Router>

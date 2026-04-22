@@ -65,7 +65,7 @@ function App() {
   // 🔥 PEERJS (FIX CONFIG)
   useEffect(() => {
     const newPeer = new Peer(undefined, {
-      host: "localhost",
+      host: process.env.REACT_APP_PEERJS_HOST || "localhost",
       port: 9090,
       path: "/peerjs",
       secure: false,

@@ -72,7 +72,7 @@ function App() {
 
       port: isProd ? undefined : 9090,
 
-      path: "/",
+      path: "/peerjs",
 
       secure: isProd,
     });

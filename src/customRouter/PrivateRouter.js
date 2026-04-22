@@ -1,10 +1,15 @@
 /** @format */
 
-import { Route, Navigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
-const PrivateRouter = (props) => {
+const PrivateRouter = ({ children }) => {
   const firstLogin = localStorage.getItem("firstLogin");
-  return firstLogin ? <Route {...props} /> : <Navigate to="/" />;
+
+  if (!firstLogin) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
 };
 
 export default PrivateRouter;

@@ -1,5 +1,6 @@
 import { GLOBALTYPES } from '../actions/globalTypes'
 import { getDataAPI } from '../../utils/fetchData'
+import { getErrorMessage } from '../../utils/errorMessage'
 
 export const SUGGES_TYPES = {
     LOADING: 'LOADING_SUGGES',
@@ -16,6 +17,6 @@ export const getSuggestions = (token) => async (dispatch) => {
         dispatch({ type: SUGGES_TYPES.LOADING, payload: false })
         
     } catch (err) {
-        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg}})
+        dispatch({type: GLOBALTYPES.ALERT, payload: {error: getErrorMessage(err)}})
     }
 }

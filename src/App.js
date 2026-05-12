@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import PageRender from "./customRouter/PageRender";
 import PrivateRouter from "./customRouter/PrivateRouter";
@@ -9,6 +10,10 @@ import PrivateRouter from "./customRouter/PrivateRouter";
 import Home from "./pages/home";
 import Login from "./pages/login";
 import Register from "./pages/register";
+import ForgotPassword from "./pages/forgot_password";
+import ResetPassword from "./pages/reset_password";
+import Premium from "./pages/premium";
+import PremiumSuccess from "./pages/premium_success";
 
 import Alert from "./components/alert/Alert";
 import Header from "./components/header/Header";
@@ -27,6 +32,16 @@ import SocketClient from "./SocketClient";
 import CallModal from "./components/message/CallModal";
 import Peer from "peerjs";
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30 * 1000,
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
+
 function App() {
   const { auth, status, modal, call } = useSelector((state) => state);
   const dispatch = useDispatch();
@@ -34,15 +49,41 @@ function App() {
   // 🔥 INIT SOCKET
   useEffect(() => {
     dispatch(refreshToken());
+  }, [dispatch]);
+
+  // Connect Socket.io only after auth is ready.
+  useEffect(() => {
+    if (!auth.token) {
+      dispatch({ type: GLOBALTYPES.SOCKET, payload: null });
+      return;
+    }
 
     const socket = io(process.env.REACT_APP_SOCKET_URL || "http://localhost:9090", {
-      transports: ["websocket"],
+      autoConnect: false,
+      transports: ["polling", "websocket"],
+      upgrade: true,
+      reconnection: true,
+      reconnectionAttempts: 10,
+      reconnectionDelay: 500,
+      timeout: 10000,
     });
 
     dispatch({ type: GLOBALTYPES.SOCKET, payload: socket });
 
-    return () => socket.close();
-  }, [dispatch]);
+    const connectTimer = setTimeout(() => {
+      if (!socket.connected) socket.connect();
+    }, 0);
+
+    socket.on("connect_error", (err) => {
+      console.warn("Socket connection error:", err.message);
+    });
+
+    return () => {
+      clearTimeout(connectTimer);
+      socket.removeAllListeners();
+      if (socket.connected) socket.disconnect();
+    };
+  }, [dispatch, auth.token]);
 
   // 🔥 FETCH DATA SAU KHI LOGIN
   useEffect(() => {
@@ -63,18 +104,17 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const isProd = !!process.env.REACT_APP_PEERJS_HOST;
+    const peerHost = process.env.REACT_APP_PEERJS_HOST || window.location.hostname;
+    const isLocalPeer = peerHost === "localhost" || peerHost === "127.0.0.1";
 
     const newPeer = new Peer(undefined, {
-      host: isProd
-        ? process.env.REACT_APP_PEERJS_HOST
-        : "localhost",
+      host: peerHost,
 
-      port: isProd ? undefined : 9090,
+      port: isLocalPeer ? 9090 : undefined,
 
       path: "/peerjs",
 
-      secure: isProd,
+      secure: !isLocalPeer,
     });
 
     dispatch({ type: GLOBALTYPES.PEER, payload: newPeer });
@@ -83,8 +123,9 @@ function App() {
   }, [dispatch]);
 
   return (
-    <Router>
-      <Alert />
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <Alert />
 
       <input type="checkbox" id="theme" />
 
@@ -98,6 +139,10 @@ function App() {
           <Routes>
             <Route path="/" element={auth.token ? <Home /> : <Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/forgot_password" element={<ForgotPassword />} />
+            <Route path="/reset_password/:token" element={<ResetPassword />} />
+            <Route path="/premium" element={auth.token ? <Premium /> : <Login />} />
+            <Route path="/premium/success" element={auth.token ? <PremiumSuccess /> : <Login />} />
 
             <Route
               path="/:page"
@@ -119,7 +164,8 @@ function App() {
           </Routes>
         </div>
       </div>
-    </Router>
+      </Router>
+    </QueryClientProvider>
   );
 }
 

@@ -9,8 +9,10 @@ import Icons from "../Icons";
 import { GLOBALTYPES } from "../../redux/actions/globalTypes";
 import { imageShow, videoShow } from "../../utils/mediaShow";
 import { imageUpload } from "../../utils/imageUpload";
-import { addMessage, getMessages, loadMoreMessages, deleteConversation } from "../../redux/actions/messageAction";
+import { MESS_TYPES, addMessage, getMessages, loadMoreMessages, deleteConversation } from "../../redux/actions/messageAction";
 import LoadIcon from "../../images/loading.gif";
+import { postDataAPI } from "../../utils/fetchData";
+import { getErrorMessage } from "../../utils/errorMessage";
 
 const RightSide = () => {
   const { auth, message, theme, socket, peer } = useSelector((state) => state);
@@ -21,6 +23,7 @@ const RightSide = () => {
   const [text, setText] = useState("");
   const [media, setMedia] = useState([]);
   const [loadMedia, setLoadMedia] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
 
   const refDisplay = useRef();
   const pageEnd = useRef();
@@ -31,6 +34,10 @@ const RightSide = () => {
   const [isLoadMore, setIsLoadMore] = useState(0);
 
   const navigate = useNavigate();
+  const isGroup = !!user?.isGroup;
+  const isAIChat = !!user?.isAIChat;
+  const groupRecipients = isGroup ? (user.recipients || []) : [];
+  const groupRecipientIds = groupRecipients.map((item) => item._id || item);
 
   useEffect(() => {
     const newData = message.data.find((item) => item._id === id);
@@ -80,6 +87,48 @@ const RightSide = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!text.trim() && media.length === 0) return;
+
+    if (isAIChat) {
+      if (aiLoading) return;
+      if (!auth.user?.aiEnabled) {
+        return dispatch({ type: GLOBALTYPES.ALERT, payload: { error: "Premium AI is not enabled for your account yet." } });
+      }
+
+      const messageText = text.trim();
+      setText("");
+      setAiLoading(true);
+
+      if (message.data.every((item) => item._id !== id)) {
+        dispatch({ type: MESS_TYPES.GET_MESSAGES, payload: { _id: id, messages: [], result: 0, page: 1 } });
+      }
+
+      dispatch({
+        type: MESS_TYPES.ADD_MESSAGE,
+        payload: {
+          sender: auth.user._id,
+          recipient: id,
+          text: messageText,
+          media: [],
+          createdAt: new Date().toISOString(),
+        },
+      });
+
+      try {
+        const res = await postDataAPI("ai-chat/message", { text: messageText }, auth.token);
+        const aiReply = res.data.messages?.[1];
+        if (aiReply) dispatch({ type: MESS_TYPES.ADD_MESSAGE, payload: { ...aiReply, conversationId: id, recipient: auth.user._id } });
+        dispatch({ type: GLOBALTYPES.ALERT, payload: { success: res.data.msg } });
+      } catch (err) {
+        dispatch({ type: GLOBALTYPES.ALERT, payload: { error: getErrorMessage(err) } });
+      } finally {
+        setAiLoading(false);
+        if (refDisplay.current) {
+          refDisplay.current.scrollIntoView({ behavior: "smooth", block: "end" });
+        }
+      }
+      return;
+    }
+
     setText("");
     setMedia([]);
     setLoadMedia(true);
@@ -89,7 +138,9 @@ const RightSide = () => {
 
     const msg = {
       sender: auth.user._id,
-      recipient: id,
+      recipient: isGroup ? undefined : id,
+      conversationId: isGroup ? id : undefined,
+      recipients: isGroup ? groupRecipientIds : undefined,
       text,
       media: newArr,
       createdAt: new Date().toISOString(),
@@ -153,10 +204,12 @@ const RightSide = () => {
 
     const msg = {
       sender: auth.user._id,
-      recipient: _id,
+      recipient: isGroup ? undefined : _id,
+      conversationId: isGroup ? id : undefined,
+      recipients: isGroup ? groupRecipientIds : undefined,
       avatar,
-      username,
-      fullname,
+      username: isGroup ? user.name : username,
+      fullname: isGroup ? `${groupRecipients.length} members` : fullname,
       video,
     };
     dispatch({ type: GLOBALTYPES.CALL, payload: msg });
@@ -164,17 +217,28 @@ const RightSide = () => {
 
   const callUser = ({ video }) => {
     const { _id, avatar, username, fullname } = auth.user;
+    const peerId = peer && (peer.id || peer._id);
+
+    if (!socket || !socket.emit) {
+      return dispatch({ type: GLOBALTYPES.ALERT, payload: { error: "Realtime socket is not connected." } });
+    }
+
+    if (!peer || !peer.open || !peerId) {
+      return dispatch({ type: GLOBALTYPES.ALERT, payload: { error: "Call service is not ready. Please try again." } });
+    }
 
     const msg = {
       sender: _id,
-      recipient: user._id,
+      recipient: isGroup ? undefined : user._id,
+      conversationId: isGroup ? id : undefined,
+      recipients: isGroup ? groupRecipientIds : undefined,
       avatar,
       username,
       fullname,
       video,
+      peerId,
+      group: isGroup ? { _id: id, name: user.name, recipients: groupRecipientIds } : undefined,
     };
-
-    if (peer.open) msg.peerId = peer._id;
 
     socket.emit("callUser", msg);
   };
@@ -194,13 +258,14 @@ const RightSide = () => {
       <div className="message_header" style={{ cursor: "pointer" }}>
         {user.length !== 0 && (
           <UserCard user={user}>
-            <div>
+            {!isAIChat && <div>
               <i className="fas fa-phone-alt" onClick={handleAudioCall} />
 
               <i className="fas fa-video mx-3" onClick={handleVideoCall} />
 
               <i className="fas fa-trash text-danger" onClick={handleDeleteConversation} />
-            </div>
+            </div>}
+            {isAIChat && <span className="ai_chat_badge">Premium AI</span>}
           </UserCard>
         )}
       </div>
@@ -213,13 +278,13 @@ const RightSide = () => {
 
           {data.map((msg, index) => (
             <div key={index}>
-              {msg.sender !== auth.user._id && (
+              {(msg.sender?._id || msg.sender) !== auth.user._id && (
                 <div className="chat_row other_message">
-                  <MsgDisplay user={user} msg={msg} theme={theme} />
+                  <MsgDisplay user={isGroup ? (msg.sender || user) : user} msg={msg} theme={theme} />
                 </div>
               )}
 
-              {msg.sender === auth.user._id && (
+              {(msg.sender?._id || msg.sender) === auth.user._id && (
                 <div className="chat_row you_message">
                   <MsgDisplay user={auth.user} msg={msg} theme={theme} data={data} />
                 </div>
@@ -232,10 +297,17 @@ const RightSide = () => {
               <img src={LoadIcon} alt="loading" />
             </div>
           )}
+
+          {aiLoading && (
+            <div className="chat_row other_message ai_typing">
+              <img src={LoadIcon} alt="loading" />
+              <span>Premium AI is thinking...</span>
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="show_media" style={{ display: media.length > 0 ? "grid" : "none" }}>
+      <div className="show_media" style={{ display: !isAIChat && media.length > 0 ? "grid" : "none" }}>
         {media.map((item, index) => (
           <div key={index} id="file_media">
             {item.type.match(/video/i)
@@ -249,8 +321,9 @@ const RightSide = () => {
       <form className="chat_input" onSubmit={handleSubmit}>
         <input
           type="text"
-          placeholder="Enter you message..."
+          placeholder={isAIChat ? "Ask Premium AI a study question..." : "Enter you message..."}
           value={text}
+          disabled={aiLoading}
           onChange={(e) => setText(e.target.value)}
           style={{
             filter: theme ? "invert(1)" : "invert(0)",
@@ -261,13 +334,13 @@ const RightSide = () => {
 
         <Icons setContent={setText} content={text} theme={theme} />
 
-        <div className="file_upload">
+        {!isAIChat && <div className="file_upload">
           <i className="fas fa-image text-danger" />
           <input type="file" name="file" id="file" multiple accept="image/*,video/*" onChange={handleChangeMedia} />
-        </div>
+        </div>}
 
-        <button type="submit" className="material-icons" disabled={text || media.length > 0 ? false : true}>
-          near_me
+        <button type="submit" className="material-icons" disabled={aiLoading || (!text && media.length === 0)}>
+          {aiLoading ? "hourglass_top" : "near_me"}
         </button>
       </form>
     </>

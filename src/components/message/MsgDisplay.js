@@ -40,7 +40,7 @@ const MsgDisplay = ({user, msg, theme, data}) => {
                         </div>
                     }
                     {
-                        msg.media.map((item, index) => (
+                        (msg.media || []).map((item, index) => (
                             <div key={index}>
                                 {
                                     item.url.match(/video/i)
@@ -54,12 +54,11 @@ const MsgDisplay = ({user, msg, theme, data}) => {
             
                 {
                     msg.call &&
-                    <button className="btn d-flex align-items-center py-3"
-                    style={{background: '#eee', borderRadius: '10px'}}>
+                    <button className="btn call_summary d-flex align-items-center py-3">
 
                         <span className="material-icons font-weight-bold mr-1"
                         style={{ 
-                            fontSize: '2.5rem', color: msg.call.times === 0 ? 'crimson' : 'green',
+                            fontSize: '2.5rem',
                             filter: theme ? 'invert(1)' : 'invert(0)'
                         }}>
                             {

@@ -39,9 +39,9 @@ const Register = () => {
 
                 <div className="form-group">
                     <label htmlFor="fullname">Full Name</label>
-                    <input type="text" className="form-control" id="fullname" name="fullname"
+                    <input type="text" id="fullname" name="fullname"
                     onChange={handleChangeInput} value={fullname}
-                    style={{background: `${alert.fullname ? '#fd2d6a14' : ''}`}} />
+                    className={`form-control ${alert.fullname ? 'is-invalid-mono' : ''}`} />
                     
                     <small className="form-text text-danger">
                         {alert.fullname ? alert.fullname : ''}
@@ -50,9 +50,9 @@ const Register = () => {
 
                 <div className="form-group">
                     <label htmlFor="username">User Name</label>
-                    <input type="text" className="form-control" id="username" name="username"
+                    <input type="text" id="username" name="username"
                     onChange={handleChangeInput} value={username.toLowerCase().replace(/ /g, '')}
-                    style={{background: `${alert.username ? '#fd2d6a14' : ''}`}} />
+                    className={`form-control ${alert.username ? 'is-invalid-mono' : ''}`} />
                     
                     <small className="form-text text-danger">
                         {alert.username ? alert.username : ''}
@@ -61,9 +61,9 @@ const Register = () => {
 
                 <div className="form-group">
                     <label htmlFor="exampleInputEmail1">Email address</label>
-                    <input type="email" className="form-control" id="exampleInputEmail1" name="email"
+                    <input type="email" id="exampleInputEmail1" name="email"
                     onChange={handleChangeInput} value={email}
-                    style={{background: `${alert.email ? '#fd2d6a14' : ''}`}} />
+                    className={`form-control ${alert.email ? 'is-invalid-mono' : ''}`} />
                     
                     <small className="form-text text-danger">
                         {alert.email ? alert.email : ''}
@@ -76,9 +76,9 @@ const Register = () => {
                     <div className="pass">
                         
                         <input type={ typePass ? "text" : "password" } 
-                        className="form-control" id="exampleInputPassword1"
+                        id="exampleInputPassword1"
                         onChange={handleChangeInput} value={password} name="password"
-                        style={{background: `${alert.password ? '#fd2d6a14' : ''}`}} />
+                        className={`form-control ${alert.password ? 'is-invalid-mono' : ''}`} />
 
                         <small onClick={() => setTypePass(!typePass)}>
                             {typePass ? 'Hide' : 'Show'}
@@ -96,9 +96,9 @@ const Register = () => {
                     <div className="pass">
                         
                         <input type={ typeCfPass ? "text" : "password" } 
-                        className="form-control" id="cf_password"
+                        id="cf_password"
                         onChange={handleChangeInput} value={cf_password} name="cf_password"
-                        style={{background: `${alert.cf_password ? '#fd2d6a14' : ''}`}} />
+                        className={`form-control ${alert.cf_password ? 'is-invalid-mono' : ''}`} />
 
                         <small onClick={() => setTypeCfPass(!typeCfPass)}>
                             {typeCfPass ? 'Hide' : 'Show'}
@@ -132,7 +132,7 @@ const Register = () => {
                 </button>
 
                 <p className="my-2">
-                    Already have an account? <Link to="/" style={{color: "crimson"}}>Login Now</Link>
+                    Already have an account? <Link to="/" className="auth_link">Login Now</Link>
                 </p>
             </form>
         </div>

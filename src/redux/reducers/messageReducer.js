@@ -17,12 +17,16 @@ const messageReducer = (state = initialState, action) => {
                     users: [action.payload, ...state.users]
                 };
             }
-            return state;
+            return {
+                ...state,
+                users: state.users.map(item => item._id === action.payload._id ? {...item, ...action.payload} : item)
+                    .sort((a, b) => Number(Boolean(b.isAIChat)) - Number(Boolean(a.isAIChat)))
+            };
         case MESS_TYPES.ADD_MESSAGE:
             return {
                 ...state,
                 data: state.data.map(item => 
-                    item._id === action.payload.recipient || item._id === action.payload.sender 
+                    item._id === action.payload.conversationId || item._id === action.payload.recipient || item._id === action.payload.sender 
                     ? {
                         ...item,
                         messages: [...item.messages, action.payload],
@@ -31,7 +35,7 @@ const messageReducer = (state = initialState, action) => {
                     : item
                 ),
                 users: state.users.map(user => 
-                    user._id === action.payload.recipient || user._id === action.payload.sender
+                    user._id === action.payload.conversationId || user._id === action.payload.recipient || user._id === action.payload.sender
                     ? {
                         ...user, 
                         text: action.payload.text, 
@@ -41,14 +45,36 @@ const messageReducer = (state = initialState, action) => {
                     : user
                 )
             };
+        case MESS_TYPES.CREATE_GROUP:
+            if(state.users.every(item => item._id !== action.payload._id)){
+                return {
+                    ...state,
+                    users: [action.payload, ...state.users]
+                }
+            }
+            return state;
+        case MESS_TYPES.UPDATE_GROUP:
+            return {
+                ...state,
+                users: EditData(state.users, action.payload._id, action.payload)
+            };
         case MESS_TYPES.GET_CONVERSATIONS:
             return {
                 ...state,
-                users: action.payload.newArr,
+                users: [
+                    ...state.users.filter(user => user.isAIChat),
+                    ...action.payload.newArr.filter(user => state.users.every(item => !item.isAIChat || item._id !== user._id))
+                ],
                 resultUsers: action.payload.result,
                 firstLoad: true
             };
         case MESS_TYPES.GET_MESSAGES:
+            if(state.data.some(item => item._id === action.payload._id)){
+                return {
+                    ...state,
+                    data: EditData(state.data, action.payload._id, action.payload)
+                };
+            }
             return {
                 ...state,
                 data: [...state.data, action.payload]

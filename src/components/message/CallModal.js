@@ -22,13 +22,14 @@ const CallModal = () => {
 
     // Set Time
     useEffect(() => {
-        const setTime = () => {
+        const timer = setInterval(() => {
             setTotal(t => t + 1)
-            setTimeout(setTime, 1000)
-        }
-        setTime()
+        }, 1000)
 
-        return () => setTotal(0)
+        return () => {
+            clearInterval(timer)
+            setTotal(0)
+        }
     },[])
 
     useEffect(() => {
@@ -40,10 +41,12 @@ const CallModal = () => {
 
     // End Call
     const addCallMessage = useCallback((call, times, disconnect) => {
-        if(call.recipient !== auth.user._id || disconnect){
+        if(call.conversationId || call.recipient !== auth.user._id || disconnect){
             const msg = {
                 sender: call.sender,
                 recipient: call.recipient,
+                conversationId: call.conversationId,
+                recipients: call.recipients,
                 text: '', 
                 media: [],
                 call: {video: call.video, times},
@@ -104,6 +107,13 @@ const CallModal = () => {
 
     // Answer Call
     const handleAnswer = () => {
+        if(!peer || !peer.open || !call.peerId) {
+            return dispatch({
+                type: GLOBALTYPES.ALERT,
+                payload: {error: 'Call service is not ready. Please try again.'}
+            })
+        }
+
         openStream(call.video).then(stream => {
             playStream(youVideo.current, stream)
             const track = stream.getTracks()
@@ -115,11 +125,20 @@ const CallModal = () => {
             });
             setAnswer(true)
             setNewCall(newCall)
+        }).catch(() => {
+            dispatch({
+                type: GLOBALTYPES.ALERT,
+                payload: {error: 'Cannot access microphone or camera.'}
+            })
         })
     }
 
     useEffect(() => {
-        peer.on('call', newCall => {
+        if(!peer || !peer.on) return;
+
+        const handlePeerCall = newCall => {
+            if(!call) return;
+
             openStream(call.video).then(stream => {
                 if(youVideo.current){
                     playStream(youVideo.current, stream)
@@ -135,10 +154,17 @@ const CallModal = () => {
                 });
                 setAnswer(true) 
                 setNewCall(newCall)
+            }).catch(() => {
+                dispatch({
+                    type: GLOBALTYPES.ALERT,
+                    payload: {error: 'Cannot access microphone or camera.'}
+                })
             })
-        })
-        return () => peer.removeListener('call')
-    },[peer, call.video])
+        }
+
+        peer.on('call', handlePeerCall)
+        return () => peer.off ? peer.off('call', handlePeerCall) : peer.removeListener('call', handlePeerCall)
+    },[peer, call, dispatch])
 
     // Disconnect
     useEffect(() => {

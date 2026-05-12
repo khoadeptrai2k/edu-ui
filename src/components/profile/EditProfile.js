@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { checkImage } from '../../utils/imageUpload'
 import { GLOBALTYPES } from '../../redux/actions/globalTypes'
+import { getErrorMessage } from '../../utils/errorMessage'
 import { updateProfileUser } from '../../redux/actions/profileAction'
 
 const EditProfile = ({setOnEdit}) => {
@@ -26,7 +27,7 @@ const EditProfile = ({setOnEdit}) => {
 
         const err = checkImage(file)
         if(err) return dispatch({
-            type: GLOBALTYPES.ALERT, payload: {error: err}
+            type: GLOBALTYPES.ALERT, payload: {error: getErrorMessage(err)}
         })
 
         setAvatar(file)

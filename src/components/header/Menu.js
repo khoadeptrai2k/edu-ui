@@ -7,13 +7,13 @@ import Avatar from '../Avatar'
 import NotifyModal from '../NotifyModal'
 
 const Menu = () => {
+    const { auth, theme, notify } = useSelector(state => state)
     const navLinks = [
         { label: 'Home', icon: 'home', path: '/'},
         { label: 'Message', icon: 'near_me', path: '/message'},
-        { label: 'Discover', icon: 'explore', path: '/discover'}
+        { label: 'Discover', icon: 'explore', path: '/discover'},
+        ...(auth.user?.role === 'admin' ? [{ label: 'Admin', icon: 'admin_panel_settings', path: '/admin'}] : [])
     ]
-
-    const { auth, theme, notify } = useSelector(state => state)
     const dispatch = useDispatch()
     const { pathname } = useLocation()
 
@@ -38,8 +38,7 @@ const Menu = () => {
                     <span className="nav-link position-relative" id="navbarDropdown" 
                     role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 
-                        <span className="material-icons" 
-                        style={{color: notify.data.length > 0 ? 'crimson' : ''}}>
+                        <span className={`material-icons ${notify.data.length > 0 ? 'has-notify' : ''}`}>
                             favorite
                         </span>
 
@@ -63,6 +62,8 @@ const Menu = () => {
 
                     <div className="dropdown-menu" aria-labelledby="navbarDropdown">
                     <Link className="dropdown-item" to={`/profile/${auth.user._id}`}>Profile</Link>
+                    <Link className="dropdown-item" to="/premium">Buy Premium</Link>
+                    <Link className="dropdown-item" to="/change_password">Change Password</Link>
 
                     <label htmlFor="theme" className="dropdown-item"
                     onClick={() => dispatch({

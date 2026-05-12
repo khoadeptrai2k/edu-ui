@@ -4,6 +4,7 @@ import { GLOBALTYPES } from '../redux/actions/globalTypes'
 import { createPost, updatePost } from '../redux/actions/postAction'
 import Icons from './Icons'
 import { imageShow, videoShow } from '../utils/mediaShow'
+import { getErrorMessage } from '../utils/errorMessage'
 
 const StatusModal = () => {
     const { auth, theme, status, socket } = useSelector(state => state)
@@ -32,7 +33,7 @@ const StatusModal = () => {
             return newImages.push(file)
         })
 
-        if(err) dispatch({ type: GLOBALTYPES.ALERT, payload: {error: err} })
+        if(err) dispatch({ type: GLOBALTYPES.ALERT, payload: {error: getErrorMessage(err)} })
         setImages([...images, ...newImages])
     }
 

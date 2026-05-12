@@ -17,10 +17,10 @@ const UserCard = ({children, user, border, handleClose, setShowFollowers, setSho
         return(
             <>
                 <div style={{filter: theme ? 'invert(1)' : 'invert(0)'}}>
-                    {user.text}
+                    {user.text.slice(0, 20)} {user.text.length > 20 && '...'}
                 </div>
                 {
-                    user.media.length > 0 && 
+                    (user.media || []).length > 0 && 
                     <div>
                         {user.media.length} <i className="fas fa-image" />
                     </div>

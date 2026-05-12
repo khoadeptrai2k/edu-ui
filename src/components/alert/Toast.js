@@ -1,6 +1,9 @@
 import React from 'react'
+import { getErrorMessage } from '../../utils/errorMessage'
 
 const Toast = ({msg, handleShow, bgColor}) => {
+    const body = getErrorMessage(msg.body, 'No message provided.')
+
     return (
         <div className={`toast show position-fixed text-light ${bgColor}`}
         style={{top: '5px', right: '5px', minWidth: '200px', zIndex: 50}}>
@@ -12,8 +15,8 @@ const Toast = ({msg, handleShow, bgColor}) => {
                     &times;
                 </button>
             </div>
-            <div className="toast-body">
-                {msg.body}
+            <div className="toast-body" style={{ color: 'black' }}>
+                {body}
             </div>
         </div>
     )

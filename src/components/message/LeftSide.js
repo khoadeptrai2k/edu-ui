@@ -6,7 +6,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { getDataAPI } from "../../utils/fetchData";
 import { GLOBALTYPES } from "../../redux/actions/globalTypes";
 import { useNavigate, useParams } from "react-router-dom";
-import { MESS_TYPES, getConversations } from "../../redux/actions/messageAction";
+import { MESS_TYPES, getAIChatAssistant, getConversations } from "../../redux/actions/messageAction";
+import GroupModal from "./GroupModal";
+import { getErrorMessage } from "../../utils/errorMessage";
 
 const LeftSide = () => {
   const { auth, message, online } = useSelector((state) => state);
@@ -14,6 +16,7 @@ const LeftSide = () => {
 
   const [search, setSearch] = useState("");
   const [searchUsers, setSearchUsers] = useState([]);
+  const [showGroupModal, setShowGroupModal] = useState(false);
 
   const navigate = useNavigate();
   const { id } = useParams();
@@ -31,7 +34,7 @@ const LeftSide = () => {
     } catch (err) {
       dispatch({
         type: GLOBALTYPES.ALERT,
-        payload: { error: err.response.data.msg },
+        payload: { error: getErrorMessage(err) },
       });
     }
   };
@@ -39,7 +42,7 @@ const LeftSide = () => {
   const handleAddUser = (user) => {
     setSearch("");
     setSearchUsers([]);
-    dispatch({ type: MESS_TYPES.ADD_USER, payload: { ...user, text: "", media: [] } });
+    dispatch({ type: MESS_TYPES.ADD_USER, payload: { ...user, text: user.text || "", media: user.media || [] } });
     dispatch({ type: MESS_TYPES.CHECK_ONLINE_OFFLINE, payload: online });
     return navigate(`/message/${user._id}`);
   };
@@ -48,6 +51,11 @@ const LeftSide = () => {
     if (id === user._id) return "active";
     return "";
   };
+
+  useEffect(() => {
+    if (!auth.token) return;
+    dispatch(getAIChatAssistant({ auth }));
+  }, [dispatch, auth]);
 
   useEffect(() => {
     if (message.firstLoad) return;
@@ -96,6 +104,10 @@ const LeftSide = () => {
         <button type="submit" style={{ display: "none" }}>
           Search
         </button>
+
+        <button type="button" className="group_new_btn" onClick={() => setShowGroupModal(true)}>
+          <span className="material-icons">group_add</span>
+        </button>
       </form>
 
       <div className="message_chat_list">
@@ -110,9 +122,11 @@ const LeftSide = () => {
         ) : (
           <>
             {message.users.map((user) => (
-              <div key={user._id} className={`message_user ${isActive(user)}`} onClick={() => handleAddUser(user)}>
+              <div key={user._id} className={`message_user ${user.isAIChat ? "ai_chat_pinned" : ""} ${isActive(user)}`} onClick={() => handleAddUser(user)}>
                 <UserCard user={user} msg={true}>
-                  {user.online ? (
+                  {user.isAIChat ? (
+                    <span className="ai_chat_badge">AI</span>
+                  ) : user.online ? (
                     <i className="fas fa-circle text-success" />
                   ) : (
                     auth.user.following.find((item) => item._id === user._id) && <i className="fas fa-circle" />
@@ -127,6 +141,8 @@ const LeftSide = () => {
           Load More
         </button>
       </div>
+
+      {showGroupModal && <GroupModal onClose={() => setShowGroupModal(false)} />}
     </>
   );
 };

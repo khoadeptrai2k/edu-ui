@@ -3,6 +3,7 @@
 import { GLOBALTYPES } from "./globalTypes";
 import { postDataAPI } from "../../utils/fetchData";
 import valid from "../../utils/valid";
+import { getErrorMessage } from "../../utils/errorMessage";
 
 export const login = (data) => async (dispatch) => {
   try {
@@ -29,7 +30,7 @@ export const login = (data) => async (dispatch) => {
     dispatch({
       type: GLOBALTYPES.ALERT,
       payload: {
-        error: err.response.data.msg,
+        error: getErrorMessage(err),
       },
     });
   }
@@ -59,7 +60,7 @@ export const refreshToken = () => async (dispatch) => {
       dispatch({
         type: GLOBALTYPES.ALERT,
         payload: {
-          error: err.response.data.msg,
+          error: getErrorMessage(err),
         },
       });
     }
@@ -93,7 +94,7 @@ export const register = (data) => async (dispatch) => {
     dispatch({
       type: GLOBALTYPES.ALERT,
       payload: {
-        error: err.response.data.msg,
+        error: getErrorMessage(err),
       },
     });
   }
@@ -109,7 +110,7 @@ export const logout = () => async (dispatch) => {
     dispatch({
       type: GLOBALTYPES.ALERT,
       payload: {
-        error: err.response.data.msg,
+        error: getErrorMessage(err),
       },
     });
   }

@@ -40,6 +40,7 @@ const CardHeader = ({ post }) => {
             <Link to={`/profile/${post.user._id}`} className="text-dark">
               {post.user.username}
             </Link>
+            {post.premium && <span className="premium_tag">premium</span>}
           </h6>
           <small className="text-muted">{moment(post.createdAt).fromNow()}</small>
         </div>

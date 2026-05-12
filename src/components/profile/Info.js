@@ -18,7 +18,7 @@ const Info = ({id, auth, profile, dispatch}) => {
             setUserData([auth.user])
         }else{
             const newData = profile.users.filter(user => user._id === id)
-            setUserData(newData)
+            setUserData([newData[0]])
         }
     }, [id, auth, dispatch, profile.users])
 

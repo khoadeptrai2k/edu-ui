@@ -1,5 +1,6 @@
 import { GLOBALTYPES, DeleteData } from '../actions/globalTypes'
-import { postDataAPI, getDataAPI, deleteDataAPI } from '../../utils/fetchData'
+import { postDataAPI, getDataAPI, deleteDataAPI, patchDataAPI } from '../../utils/fetchData'
+import { getErrorMessage } from '../../utils/errorMessage'
 
 export const MESS_TYPES = {
     ADD_USER: 'ADD_USER',
@@ -9,7 +10,22 @@ export const MESS_TYPES = {
     UPDATE_MESSAGES: 'UPDATE_MESSAGES',
     DELETE_MESSAGES: 'DELETE_MESSAGES',
     DELETE_CONVERSATION: 'DELETE_CONVERSATION',
+    CREATE_GROUP: 'CREATE_GROUP',
+    UPDATE_GROUP: 'UPDATE_GROUP',
     CHECK_ONLINE_OFFLINE: 'CHECK_ONLINE_OFFLINE'
+}
+
+const GROUP_AVATAR = 'https://res.cloudinary.com/EduSocialchannel/image/upload/v1602752402/avatar/avatar_cugq40.png'
+
+export const getAIChatAssistant = ({auth}) => async (dispatch) => {
+    try {
+        const res = await getDataAPI('ai-chat/assistant', auth.token)
+        dispatch({type: MESS_TYPES.ADD_USER, payload: res.data.user})
+        return res.data.user
+    } catch (err) {
+        dispatch({type: GLOBALTYPES.ALERT, payload: {error: getErrorMessage(err)}})
+        return null
+    }
 }
 
 
@@ -18,12 +34,59 @@ export const addMessage = ({msg, auth, socket}) => async (dispatch) =>{
     dispatch({type: MESS_TYPES.ADD_MESSAGE, payload: msg})
 
     const { _id, avatar, fullname, username } = auth.user
-    socket.emit('addMessage', {...msg, user: { _id, avatar, fullname, username } })
+    if(socket && socket.emit){
+        socket.emit('addMessage', {...msg, user: { _id, avatar, fullname, username } })
+    }
     
     try {
         await postDataAPI('message', msg, auth.token)
     } catch (err) {
-        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg}})
+        dispatch({type: GLOBALTYPES.ALERT, payload: {error: getErrorMessage(err)}})
+    }
+}
+
+export const createGroup = ({name, recipients, auth, socket}) => async (dispatch) => {
+    try {
+        const res = await postDataAPI('groups', {name, recipients}, auth.token)
+        const group = {
+            ...res.data.group,
+            _id: res.data.group._id,
+            username: res.data.group.name,
+            fullname: `${res.data.group.recipients.length} members`,
+            avatar: res.data.group.avatar || GROUP_AVATAR,
+            text: '',
+            media: [],
+            isGroup: true
+        }
+        dispatch({type: MESS_TYPES.CREATE_GROUP, payload: group})
+        if(socket && socket.emit) {
+            socket.emit('createGroup', {
+                ...group,
+                recipients: res.data.group.recipients.map(user => user._id)
+            })
+        }
+        return group
+    } catch (err) {
+        dispatch({type: GLOBALTYPES.ALERT, payload: {error: getErrorMessage(err)}})
+        return null
+    }
+}
+
+export const updateGroup = ({id, data, auth}) => async (dispatch) => {
+    try {
+        const res = await patchDataAPI(`groups/${id}`, data, auth.token)
+        const group = {
+            ...res.data.group,
+            username: res.data.group.name,
+            fullname: `${res.data.group.recipients.length} members`,
+            avatar: res.data.group.avatar || GROUP_AVATAR,
+            isGroup: true
+        }
+        dispatch({type: MESS_TYPES.UPDATE_GROUP, payload: group})
+        return group
+    } catch (err) {
+        dispatch({type: GLOBALTYPES.ALERT, payload: {error: getErrorMessage(err)}})
+        return null
     }
 }
 
@@ -33,11 +96,24 @@ export const getConversations = ({auth, page = 1}) => async (dispatch) => {
         
         let newArr = [];
         res.data.conversations.forEach(item => {
-            item.recipients.forEach(cv => {
-                if(cv._id !== auth.user._id){
-                    newArr.push({...cv, text: item.text, media: item.media, call: item.call})
-                }
-            })
+            if(item.isGroup){
+                newArr.push({
+                    ...item,
+                    username: item.name,
+                    fullname: `${item.recipients.length} members`,
+                    avatar: item.avatar || GROUP_AVATAR,
+                    text: item.text,
+                    media: item.media,
+                    call: item.call,
+                    isGroup: true
+                })
+            }else{
+                item.recipients.forEach(cv => {
+                    if(cv._id !== auth.user._id){
+                        newArr.push({...cv, text: item.text, media: item.media, call: item.call, isGroup: false})
+                    }
+                })
+            }
         })
 
         dispatch({
@@ -46,7 +122,7 @@ export const getConversations = ({auth, page = 1}) => async (dispatch) => {
         })
 
     } catch (err) {
-        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg}})
+        dispatch({type: GLOBALTYPES.ALERT, payload: {error: getErrorMessage(err)}})
     }
 }
 
@@ -57,7 +133,7 @@ export const getMessages = ({auth, id, page = 1}) => async (dispatch) => {
 
         dispatch({type: MESS_TYPES.GET_MESSAGES, payload: {...newData, _id: id, page}})
     } catch (err) {
-        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg}})
+        dispatch({type: GLOBALTYPES.ALERT, payload: {error: getErrorMessage(err)}})
     }
 }
 
@@ -68,7 +144,7 @@ export const loadMoreMessages = ({auth, id, page = 1}) => async (dispatch) => {
 
         dispatch({type: MESS_TYPES.UPDATE_MESSAGES, payload: {...newData, _id: id, page}})
     } catch (err) {
-        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg}})
+        dispatch({type: GLOBALTYPES.ALERT, payload: {error: getErrorMessage(err)}})
     }
 }
 
@@ -78,7 +154,7 @@ export const deleteMessages = ({msg, data, auth}) => async (dispatch) => {
     try {
         await deleteDataAPI(`message/${msg._id}`, auth.token)
     } catch (err) {
-        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg}})
+        dispatch({type: GLOBALTYPES.ALERT, payload: {error: getErrorMessage(err)}})
     }
 }
 
@@ -87,6 +163,6 @@ export const deleteConversation = ({auth, id}) => async (dispatch) => {
     try {
         await deleteDataAPI(`conversation/${id}`, auth.token)
     } catch (err) {
-        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg}})
+        dispatch({type: GLOBALTYPES.ALERT, payload: {error: getErrorMessage(err)}})
     }
 }

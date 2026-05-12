@@ -22,20 +22,23 @@
 
 /* ---------- Comments ---------- */
 .comment_display{
-    padding: 10px 25px;
+    padding: 10px 20px;
 }
 .comment_card .comment_content{
-    background: #eee;
-    padding: 7px;
-    border-radius: 10px;
+    background: #f8fafc;
+    padding: 10px 12px;
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    border-radius: 8px;
     border-top-left-radius: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.04);
 }
 .comment_card .comment_content .readMore{
     cursor: pointer;
-    color: crimson;
+    color: #dc2626;
+    font-weight: 700;
 }
 
 .comment_card .comment_content .nav-item{
@@ -56,6 +59,8 @@
 }
 .comment_card .comment_content textarea{
     width: 100%;
-    border: none;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    border-radius: 8px;
     outline: none;
+    padding: 8px 10px;
 }

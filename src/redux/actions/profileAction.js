@@ -2,6 +2,7 @@ import { GLOBALTYPES, DeleteData } from './globalTypes'
 import { getDataAPI, patchDataAPI } from '../../utils/fetchData'
 import { imageUpload } from '../../utils/imageUpload'
 import { createNotify, removeNotify } from '../actions/notifyAction'
+import { getErrorMessage } from '../../utils/errorMessage'
 
 
 export const PROFILE_TYPES = {
@@ -40,7 +41,7 @@ export const getProfileUsers = ({id, auth}) => async (dispatch) => {
     } catch (err) {
         dispatch({
             type: GLOBALTYPES.ALERT, 
-            payload: {error: err.response.data.msg}
+            payload: {error: getErrorMessage(err)}
         })
     }
     
@@ -83,7 +84,7 @@ export const updateProfileUser = ({userData, avatar, auth}) => async (dispatch) 
     } catch (err) {
         dispatch({
             type: GLOBALTYPES.ALERT, 
-            payload: {error: err.response.data.msg}
+            payload: {error: getErrorMessage(err)}
         })
     }
 }
@@ -129,7 +130,7 @@ export const follow = ({users, user, auth, socket}) => async (dispatch) => {
     } catch (err) {
         dispatch({
             type: GLOBALTYPES.ALERT, 
-            payload: {error: err.response.data.msg}
+            payload: {error: getErrorMessage(err)}
         })
     }
 }
@@ -179,7 +180,7 @@ export const unfollow = ({users, user, auth, socket}) => async (dispatch) => {
     } catch (err) {
         dispatch({
             type: GLOBALTYPES.ALERT, 
-            payload: {error: err.response.data.msg}
+            payload: {error: getErrorMessage(err)}
         })
     }
 }

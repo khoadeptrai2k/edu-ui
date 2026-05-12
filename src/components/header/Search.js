@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { getDataAPI } from '../../utils/fetchData'
 import { GLOBALTYPES } from '../../redux/actions/globalTypes'
+import { getErrorMessage } from '../../utils/errorMessage'
 import UserCard from '../UserCard'
 import LoadIcon from '../../images/loading.gif'
 
@@ -25,7 +26,7 @@ const Search = () => {
             setLoad(false)
         } catch (err) {
             dispatch({
-                type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg}
+                type: GLOBALTYPES.ALERT, payload: {error: getErrorMessage(err)}
             })
         }
     }

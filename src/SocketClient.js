@@ -4,6 +4,7 @@ import { POST_TYPES } from './redux/actions/postAction'
 import { GLOBALTYPES } from './redux/actions/globalTypes'
 import { NOTIFY_TYPES } from './redux/actions/notifyAction'
 import { MESS_TYPES } from './redux/actions/messageAction'
+import { logout } from './redux/actions/authAction'
 
 import audiobell from './audio/got-it-done-613.mp3'
 
@@ -28,11 +29,23 @@ const SocketClient = () => {
 
     // joinUser
     useEffect(() => {
+        if(!socket || !socket.emit || !auth.user?._id) return;
         socket.emit('joinUser', auth.user)
     },[socket, auth.user])
 
+    useEffect(() => {
+        if(!socket || !socket.on) return;
+        socket.on('accountDeactivated', () => {
+            dispatch({type: GLOBALTYPES.ALERT, payload: {error: 'Your account has been deactivated.'}})
+            dispatch(logout())
+        })
+
+        return () => socket.off('accountDeactivated')
+    },[socket, dispatch])
+
     // Likes
     useEffect(() => {
+        if(!socket || !socket.on) return;
         socket.on('likeToClient', newPost =>{
             dispatch({type: POST_TYPES.UPDATE_POST, payload: newPost})
         })
@@ -41,6 +54,7 @@ const SocketClient = () => {
     },[socket, dispatch])
 
     useEffect(() => {
+        if(!socket || !socket.on) return;
         socket.on('unLikeToClient', newPost =>{
             dispatch({type: POST_TYPES.UPDATE_POST, payload: newPost})
         })
@@ -51,6 +65,7 @@ const SocketClient = () => {
 
     // Comments
     useEffect(() => {
+        if(!socket || !socket.on) return;
         socket.on('createCommentToClient', newPost =>{
             dispatch({type: POST_TYPES.UPDATE_POST, payload: newPost})
         })
@@ -59,6 +74,7 @@ const SocketClient = () => {
     },[socket, dispatch])
 
     useEffect(() => {
+        if(!socket || !socket.on) return;
         socket.on('deleteCommentToClient', newPost =>{
             dispatch({type: POST_TYPES.UPDATE_POST, payload: newPost})
         })
@@ -69,6 +85,7 @@ const SocketClient = () => {
 
     // Follow
     useEffect(() => {
+        if(!socket || !socket.on) return;
         socket.on('followToClient', newUser =>{
             dispatch({type: GLOBALTYPES.AUTH, payload: {...auth, user: newUser}})
         })
@@ -77,6 +94,7 @@ const SocketClient = () => {
     },[socket, dispatch, auth])
 
     useEffect(() => {
+        if(!socket || !socket.on) return;
         socket.on('unFollowToClient', newUser =>{
             dispatch({type: GLOBALTYPES.AUTH, payload: {...auth, user: newUser}})
         })
@@ -87,6 +105,7 @@ const SocketClient = () => {
 
     // Notification
     useEffect(() => {
+        if(!socket || !socket.on) return;
         socket.on('createNotifyToClient', msg =>{
             dispatch({type: NOTIFY_TYPES.CREATE_NOTIFY, payload: msg})
 
@@ -103,6 +122,7 @@ const SocketClient = () => {
     },[socket, dispatch, notify.sound])
 
     useEffect(() => {
+        if(!socket || !socket.on) return;
         socket.on('removeNotifyToClient', msg =>{
             dispatch({type: NOTIFY_TYPES.REMOVE_NOTIFY, payload: msg})
         })
@@ -113,28 +133,46 @@ const SocketClient = () => {
 
     // Message
     useEffect(() => {
+        if(!socket || !socket.on) return;
         socket.on('addMessageToClient', msg =>{
-            dispatch({type: MESS_TYPES.ADD_MESSAGE, payload: msg})
+            const payload = msg.conversationId && msg.user
+                ? {...msg, sender: msg.user}
+                : msg
 
-            dispatch({
-                type: MESS_TYPES.ADD_USER, 
-                payload: {
-                    ...msg.user, 
-                    text: msg.text, 
-                    media: msg.media
-                }
-            })
+            dispatch({type: MESS_TYPES.ADD_MESSAGE, payload})
+
+            if(!msg.conversationId){
+                dispatch({
+                    type: MESS_TYPES.ADD_USER, 
+                    payload: {
+                        ...msg.user, 
+                        text: msg.text, 
+                        media: msg.media
+                    }
+                })
+            }
         })
 
         return () => socket.off('addMessageToClient')
     },[socket, dispatch])
 
+    useEffect(() => {
+        if(!socket || !socket.on) return;
+        socket.on('createGroupToClient', group =>{
+            dispatch({type: MESS_TYPES.CREATE_GROUP, payload: group})
+        })
+
+        return () => socket.off('createGroupToClient')
+    },[socket, dispatch])
+
     // Check User Online / Offline
     useEffect(() => {
+        if(!socket || !socket.emit || !auth.user?._id) return;
         socket.emit('checkUserOnline', auth.user)
     },[socket, auth.user])
 
     useEffect(() => {
+        if(!socket || !socket.on) return;
         socket.on('checkUserOnlineToMe', data =>{
             data.forEach(item => {
                 if(!online.includes(item.id)){
@@ -147,6 +185,7 @@ const SocketClient = () => {
     },[socket, dispatch, online])
 
     useEffect(() => {
+        if(!socket || !socket.on) return;
         socket.on('checkUserOnlineToClient', id =>{
             if(!online.includes(id)){
                 dispatch({type: GLOBALTYPES.ONLINE, payload: id})
@@ -158,6 +197,7 @@ const SocketClient = () => {
 
     // Check User Offline
     useEffect(() => {
+        if(!socket || !socket.on) return;
         socket.on('CheckUserOffline', id =>{
             dispatch({type: GLOBALTYPES.OFFLINE, payload: id})
         })
@@ -168,6 +208,7 @@ const SocketClient = () => {
 
     // Call User
     useEffect(() => {
+        if(!socket || !socket.on) return;
         socket.on('callUserToClient', data =>{
             dispatch({type: GLOBALTYPES.CALL, payload: data})
         })
@@ -176,6 +217,7 @@ const SocketClient = () => {
     },[socket, dispatch])
 
     useEffect(() => {
+        if(!socket || !socket.on) return;
         socket.on('userBusy', data =>{
             dispatch({type: GLOBALTYPES.ALERT, payload: {error: `${call.username} is busy!`}})
         })

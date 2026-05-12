@@ -69,13 +69,17 @@ const Login = () => {
           </div>
         </div>
 
+        <div className="text-right mb-3">
+          <Link to="/forgot_password" className="auth_link">Forgot password?</Link>
+        </div>
+
         <button type="submit" className="btn btn-dark w-100" disabled={email && password ? false : true}>
           Login
         </button>
 
         <p className="my-2">
           You don't have an account?{" "}
-          <Link to="/register" style={{ color: "crimson" }}>
+          <Link to="/register" className="auth_link">
             Register Now
           </Link>
         </p>

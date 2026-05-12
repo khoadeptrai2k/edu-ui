@@ -4,6 +4,7 @@ import LoadIcon from '../../images/loading.gif'
 import LoadMoreBtn from '../LoadMoreBtn'
 import { getDataAPI } from '../../utils/fetchData'
 import { GLOBALTYPES } from '../../redux/actions/globalTypes'
+import { getErrorMessage } from '../../utils/errorMessage'
 
 const Saved = ({auth, dispatch}) => {
     const [savePosts, setSavePosts] = useState([])
@@ -20,7 +21,7 @@ const Saved = ({auth, dispatch}) => {
             setLoad(false)
         })
         .catch(err => {
-            dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg}})
+            dispatch({type: GLOBALTYPES.ALERT, payload: {error: getErrorMessage(err)}})
         })
 
         return () => setSavePosts([])

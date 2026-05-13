@@ -110,7 +110,7 @@ function App() {
     const newPeer = new Peer(undefined, {
       host: peerHost,
 
-      port: isLocalPeer ? 9090 : undefined,
+      port: isLocalPeer ? 9090 : 443,
 
       path: "/peerjs",
 

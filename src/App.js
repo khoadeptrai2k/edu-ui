@@ -14,6 +14,7 @@ import ForgotPassword from "./pages/forgot_password";
 import ResetPassword from "./pages/reset_password";
 import Premium from "./pages/premium";
 import PremiumSuccess from "./pages/premium_success";
+import Landing from "./pages/landing";
 
 import Alert from "./components/alert/Alert";
 import Header from "./components/header/Header";
@@ -138,6 +139,7 @@ function App() {
 
           <Routes>
             <Route path="/" element={auth.token ? <Home /> : <Login />} />
+            <Route path="/landing" element={<Landing />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot_password" element={<ForgotPassword />} />
             <Route path="/reset_password/:token" element={<ResetPassword />} />

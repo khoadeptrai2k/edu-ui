@@ -12,6 +12,7 @@ const Menu = () => {
         { label: 'Home', icon: 'home', path: '/'},
         { label: 'Message', icon: 'near_me', path: '/message'},
         { label: 'Discover', icon: 'explore', path: '/discover'},
+        { label: 'Info', icon: 'info_outline', path: '/landing'},
         ...(auth.user?.role === 'admin' ? [{ label: 'Admin', icon: 'admin_panel_settings', path: '/admin'}] : [])
     ]
     const dispatch = useDispatch()
@@ -27,7 +28,7 @@ const Menu = () => {
                 {
                     navLinks.map((link, index) => (
                         <li className={`nav-item px-2 ${isActive(link.path)}`} key={index}>
-                            <Link className="nav-link" to={link.path}>
+                            <Link className="nav-link" to={link.path} title={link.label}>
                                 <span className="material-icons">{link.icon}</span>
                             </Link>
                         </li>

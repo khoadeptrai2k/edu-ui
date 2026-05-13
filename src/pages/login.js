@@ -83,6 +83,11 @@ const Login = () => {
             Register Now
           </Link>
         </p>
+        <p className="my-2 text-center">
+          <Link to="/landing" className="auth_link">
+            Giới thiệu hệ thống Edu Social
+          </Link>
+        </p>
       </form>
     </div>
   );

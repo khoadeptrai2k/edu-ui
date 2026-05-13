@@ -1,9 +1,60 @@
+@import url("./auth.css");
+@import url("./loading.css");
+@import url("./header.css");
+@import url("./avatar.css");
+@import url("./profile.css");
+@import url("./home.css");
+@import url("./status_modal.css");
+@import url("./comments.css");
+@import url("./post_thumb.css");
+@import url("./message.css");
+@import url("./icons.css");
+@import url("./call_modal.css");
+
+:root {
+  --mono-bg: #f1f5f9;
+  --mono-surface: rgba(255, 255, 255, 0.9);
+  --mono-surface-strong: #ffffff;
+  --mono-ink: #0f172a;
+  --mono-muted: #64748b;
+  --mono-soft: #e2e8f0;
+  --mono-line: rgba(15, 23, 42, 0.09);
+  --mono-line-strong: rgba(15, 23, 42, 0.16);
+  --mono-shadow: 0 24px 60px rgba(15, 23, 42, 0.1);
+  --mono-shadow-soft: 0 12px 32px rgba(15, 23, 42, 0.06);
+  --mono-radius: 12px;
+  --mono-brand: #2563eb;
+  --mono-brand-soft: rgba(37, 99, 235, 0.12);
+  --mono-accent: #059669;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes softPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(37, 99, 235, 0);
+  }
+}
+
 * {
   padding: 0;
   box-sizing: border-box;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -14,7 +65,13 @@ html {
 }
 
 body {
-  background: #f6f8fb;
+  min-height: 100vh;
+  color: var(--mono-ink);
+  background-color: var(--mono-bg);
+  background-image:
+    radial-gradient(1200px 600px at 12% -10%, rgba(37, 99, 235, 0.12), transparent 55%),
+    radial-gradient(900px 500px at 88% 0%, rgba(16, 185, 129, 0.1), transparent 50%),
+    linear-gradient(180deg, #f8fafc 0%, #eef2ff 45%, #f1f5f9 100%);
 }
 
 a {
@@ -33,7 +90,7 @@ input {
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+  font-family: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
 
@@ -41,25 +98,22 @@ code {
   display: none;
 }
 #theme:checked ~ * {
-  filter: invert(1);
+  filter: invert(1) hue-rotate(180deg);
 }
 
 .App {
   width: 100%;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at 12% 8%, rgba(14, 165, 233, 0.14), transparent 28%),
-    radial-gradient(circle at 88% 0%, rgba(16, 185, 129, 0.13), transparent 26%),
-    linear-gradient(135deg, rgba(247, 250, 252, 0.96), rgba(238, 246, 255, 0.96)),
-    #f8fafc;
-  color: #102033;
+  color: var(--mono-ink);
+  background: transparent;
 }
 
 .main {
-  max-width: 1180px;
+  max-width: 1200px;
   width: 100%;
   min-height: 100vh;
-  margin: auto;
+  margin: 0 auto;
+  padding: 0 12px 48px;
 }
 
 img {
@@ -67,9 +121,9 @@ img {
 }
 
 .dropdown-menu {
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 8px;
-  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.14);
+  border: 1px solid var(--mono-line);
+  border-radius: var(--mono-radius);
+  box-shadow: var(--mono-shadow);
   overflow: hidden;
 }
 
@@ -80,49 +134,10 @@ img {
 }
 
 .dropdown-item:hover {
-  background: #eef6ff;
-  color: #0369a1;
+  background: #eff6ff;
+  color: #1d4ed8;
   transform: translateX(2px);
 }
-
-/* -------- AUTH ---------- */
-@import url("./auth.css");
-
-/* -------- LOADING ---------- */
-@import url("./loading.css");
-
-/* -------- Header ---------- */
-@import url("./header.css");
-
-/* -------- Avatar ---------- */
-@import url("./avatar.css");
-
-/* -------- Header ---------- */
-@import url("./header.css");
-
-/* -------- Profile ---------- */
-@import url("./profile.css");
-
-/* -------- Home ---------- */
-@import url("./home.css");
-
-/* -------- Status Modal ---------- */
-@import url("./status_modal.css");
-
-/* -------- Comments ---------- */
-@import url("./comments.css");
-
-/* -------- Post Thumb ---------- */
-@import url("./post_thumb.css");
-
-/* -------- Message---------- */
-@import url("./message.css");
-
-/* -------- Icons---------- */
-@import url("./icons.css");
-
-/* -------- Call Modal---------- */
-@import url("./call_modal.css");
 
 
 
@@ -172,89 +187,14 @@ img {
   overflow: hidden;
 }
 
-/* -------- Monochrome 2026 System -------- */
-:root {
-  --mono-bg: #f4f4f2;
-  --mono-surface: rgba(255, 255, 255, 0.86);
-  --mono-surface-strong: #ffffff;
-  --mono-ink: #070707;
-  --mono-muted: #6b6b6b;
-  --mono-soft: #e9e9e4;
-  --mono-line: rgba(7, 7, 7, 0.1);
-  --mono-line-strong: rgba(7, 7, 7, 0.22);
-  --mono-shadow: 0 24px 80px rgba(0, 0, 0, 0.12);
-  --mono-shadow-soft: 0 12px 34px rgba(0, 0, 0, 0.08);
-  --mono-radius: 8px;
-}
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(14px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes softPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.14); }
-  50% { box-shadow: 0 0 0 7px rgba(0, 0, 0, 0); }
-}
-
-body {
-  background:
-    linear-gradient(90deg, rgba(0,0,0,0.035) 1px, transparent 1px),
-    linear-gradient(180deg, rgba(0,0,0,0.035) 1px, transparent 1px),
-    var(--mono-bg);
-  background-size: 44px 44px;
-  color: var(--mono-ink);
-}
-
-.App {
-  background:
-    radial-gradient(circle at 16% 8%, rgba(0, 0, 0, 0.08), transparent 28%),
-    radial-gradient(circle at 86% 2%, rgba(255, 255, 255, 0.84), transparent 24%),
-    linear-gradient(135deg, #f8f8f6, #ecece8);
-  color: var(--mono-ink);
-}
-
-.main {
-  max-width: 1200px;
-}
-
-.text-primary,
-.text-danger,
-.text-info,
-.text-success,
-.text-muted,
-.text-dark,
-.btn-outline-info,
-.btn-outline-danger {
-  color: var(--mono-ink) !important;
-}
-
-.bg-light,
-.bg-primary,
-.bg-danger,
-.bg-success,
-.btn-info,
-.btn-danger,
-.btn-primary {
-  background: var(--mono-ink) !important;
-  color: #fff !important;
-  border-color: var(--mono-ink) !important;
-}
-
 .btn,
 button {
   border-radius: var(--mono-radius);
 }
 
-.btn-outline-info,
-.btn-outline-danger {
-  border-color: var(--mono-line-strong) !important;
-  background: #fff !important;
-}
-
 .btn-outline-info:hover,
 .btn-outline-danger:hover,
-.btn:hover {
+.btn:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: var(--mono-shadow-soft);
 }
@@ -273,11 +213,6 @@ button {
   backdrop-filter: blur(20px);
 }
 
-.dropdown-item:hover {
-  background: #111 !important;
-  color: #fff !important;
-}
-
 input,
 textarea,
 select {
@@ -288,26 +223,26 @@ select {
 input:focus,
 textarea:focus,
 select:focus {
-  border-color: var(--mono-ink) !important;
-  box-shadow: 0 0 0 4px rgba(0,0,0,0.09) !important;
+  border-color: rgba(37, 99, 235, 0.45) !important;
+  box-shadow: 0 0 0 4px var(--mono-brand-soft) !important;
 }
 
 .header {
   min-height: 78px;
   border-color: var(--mono-line) !important;
-  background: rgba(255,255,255,0.82) !important;
-  box-shadow: 0 18px 50px rgba(0,0,0,0.1) !important;
+  background: rgba(255, 255, 255, 0.78) !important;
+  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.06) !important;
 }
 
 .header .logo h1 {
   color: var(--mono-ink) !important;
-  font-size: 1.22rem !important;
-  letter-spacing: 0.08em !important;
+  font-size: 1.2rem !important;
+  letter-spacing: -0.02em !important;
 }
 
 .header .logo h1::before {
-  background: #111 !important;
-  box-shadow: 8px 8px 0 #dcdcd6 !important;
+  background: linear-gradient(135deg, var(--mono-brand), var(--mono-accent)) !important;
+  box-shadow: 0 10px 26px rgba(37, 99, 235, 0.28) !important;
 }
 
 .header .menu .nav-link,
@@ -326,14 +261,14 @@ select:focus {
 .chat_input button:hover,
 .message_header .group_new_btn:hover {
   color: #fff !important;
-  background: var(--mono-ink) !important;
+  background: linear-gradient(135deg, var(--mono-brand), #1d4ed8) !important;
   transform: translateY(-2px);
 }
 
 .header .menu .notify_length {
-  background: var(--mono-ink) !important;
+  background: linear-gradient(135deg, #ef4444, #f97316) !important;
   color: #fff !important;
-  box-shadow: 0 8px 18px rgba(0,0,0,0.2) !important;
+  box-shadow: 0 8px 18px rgba(239, 68, 68, 0.35) !important;
 }
 
 .header .search_form #search,
@@ -354,7 +289,7 @@ select:focus {
   min-height: 250px !important;
   border-color: var(--mono-line) !important;
   background:
-    linear-gradient(135deg, rgba(255,255,255,0.96), rgba(245,245,242,0.86)),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(239, 246, 255, 0.88)),
     var(--mono-surface) !important;
   box-shadow: var(--mono-shadow) !important;
   animation: fadeUp 420ms ease both;
@@ -366,7 +301,8 @@ select:focus {
   right: -130px !important;
   bottom: -150px !important;
   background:
-    repeating-linear-gradient(45deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 10px) !important;
+    radial-gradient(circle at 30% 30%, rgba(37, 99, 235, 0.2), transparent 55%),
+    radial-gradient(circle at 70% 70%, rgba(5, 150, 105, 0.16), transparent 50%) !important;
   border-radius: 50%;
 }
 
@@ -458,8 +394,9 @@ select:focus {
 }
 
 .level-card {
-  background: #111 !important;
+  background: linear-gradient(145deg, #1e3a8a 0%, var(--mono-brand) 55%, #0ea5e9 100%) !important;
   color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
 }
 
 .level-card span,
@@ -469,7 +406,7 @@ select:focus {
 }
 
 .bento-wide {
-  background: #111 !important;
+  background: linear-gradient(145deg, #0f172a 0%, #1e40af 50%, var(--mono-brand) 100%) !important;
 }
 
 .bento-wide span,
@@ -489,7 +426,7 @@ select:focus {
 .post-card:hover,
 .message_chat_list .message_user:hover,
 .message_chat_list .message_user.active {
-  border-color: var(--mono-ink) !important;
+  border-color: rgba(37, 99, 235, 0.35) !important;
   background: #fff !important;
   box-shadow: var(--mono-shadow) !important;
 }
@@ -501,7 +438,7 @@ select:focus {
 }
 
 .status .statusBtn:hover {
-  background: var(--mono-ink) !important;
+  background: linear-gradient(135deg, var(--mono-brand), #1d4ed8) !important;
   color: #fff !important;
   box-shadow: none !important;
 }
@@ -524,10 +461,6 @@ select:focus {
   background: rgba(255,255,255,0.74) !important;
 }
 
-.posts .card_icon_menu img {
-  filter: grayscale(1) contrast(1.2);
-}
-
 .comments,
 .comment_card .comment_content,
 .show_media,
@@ -541,14 +474,14 @@ select:focus {
 .comment_input .postBtn,
 .group_create_btn,
 .message_header .group_new_btn {
-  background: var(--mono-ink) !important;
+  background: linear-gradient(135deg, var(--mono-brand), #1d4ed8) !important;
   color: #fff !important;
-  box-shadow: 0 16px 30px rgba(0,0,0,0.18) !important;
+  box-shadow: 0 14px 28px rgba(37, 99, 235, 0.28) !important;
 }
 
 .you_message .chat_text {
-  background: #111 !important;
-  border-color: #111 !important;
+  background: linear-gradient(135deg, #1e40af, var(--mono-brand)) !important;
+  border-color: rgba(37, 99, 235, 0.35) !important;
   color: #fff !important;
 }
 
@@ -572,7 +505,7 @@ select:focus {
   top: 0;
   z-index: 2;
   margin-bottom: 8px;
-  border-color: var(--mono-ink) !important;
+  border-color: rgba(37, 99, 235, 0.35) !important;
   background: #fff !important;
   box-shadow: var(--mono-shadow-soft);
 }
@@ -583,9 +516,9 @@ select:focus {
   justify-content: center;
   min-height: 28px;
   padding: 0 10px;
-  border: 1px solid var(--mono-ink);
+  border: 1px solid var(--mono-brand);
   border-radius: 999px;
-  background: var(--mono-ink);
+  background: linear-gradient(135deg, var(--mono-brand), #1d4ed8);
   color: #fff;
   font-size: 0.72rem;
   font-weight: 950;
@@ -618,21 +551,20 @@ select:focus {
 
 .fa-circle.text-success,
 .message_chat_list .message_user .fa-circle.active {
-  color: var(--mono-ink) !important;
+  color: var(--mono-accent) !important;
   animation: softPulse 1.8s ease infinite;
 }
 
 .profile_tab button.active {
-  color: var(--mono-ink) !important;
-  border-color: var(--mono-ink) !important;
+  color: var(--mono-brand) !important;
+  border-color: rgba(37, 99, 235, 0.45) !important;
 }
 
 .auth_page {
   background:
-    linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px),
-    linear-gradient(180deg, rgba(0,0,0,0.04) 1px, transparent 1px),
-    #f5f5f2 !important;
-  background-size: 42px 42px !important;
+    radial-gradient(900px 500px at 12% 10%, rgba(37, 99, 235, 0.12), transparent 50%),
+    radial-gradient(700px 420px at 88% 20%, rgba(5, 150, 105, 0.1), transparent 48%),
+    linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%) !important;
 }
 
 .auth_page form {
@@ -641,9 +573,9 @@ select:focus {
 
 .auth_page form button,
 .auth_page form .btn {
-  background: var(--mono-ink) !important;
+  background: linear-gradient(135deg, var(--mono-brand), #1d4ed8) !important;
   color: #fff !important;
-  box-shadow: 0 18px 34px rgba(0,0,0,0.18) !important;
+  box-shadow: 0 18px 34px rgba(37, 99, 235, 0.28) !important;
 }
 
 .status_modal,
@@ -677,23 +609,23 @@ select:focus {
 }
 
 .call_box {
-  background: #111 !important;
-  border: 1px solid rgba(255,255,255,0.18);
+  background: linear-gradient(165deg, #0f172a 0%, #1e293b 45%, #0f172a 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: var(--mono-radius) !important;
-  box-shadow: 0 28px 100px rgba(0,0,0,0.34) !important;
+  box-shadow: 0 28px 100px rgba(15, 23, 42, 0.45) !important;
 }
 
 .call_menu button,
 .call_modal .end_call {
   background: #fff !important;
-  color: #111 !important;
+  color: var(--mono-ink) !important;
   transition: transform 180ms ease, background 180ms ease;
 }
 
 .call_menu button:hover,
 .call_modal .end_call:hover {
   transform: translateY(-2px) scale(1.04);
-  background: #e8e8e2 !important;
+  background: #e2e8f0 !important;
 }
 
 .call_modal .you_video {
@@ -703,16 +635,17 @@ select:focus {
 
 .auth_link,
 .comment_toggle {
-  color: var(--mono-ink) !important;
-  font-weight: 900;
-  text-decoration: underline;
+  color: var(--mono-brand) !important;
+  font-weight: 800;
+  text-decoration: none;
   text-underline-offset: 4px;
   cursor: pointer;
 }
 
 .auth_link:hover,
 .comment_toggle:hover {
-  color: var(--mono-muted) !important;
+  color: #1d4ed8 !important;
+  text-decoration: underline;
 }
 
 .is-invalid-mono {
@@ -733,7 +666,7 @@ select:focus {
 }
 
 .has-notify {
-  color: var(--mono-ink) !important;
+  color: var(--mono-brand) !important;
   animation: softPulse 1.8s ease infinite;
 }
 
@@ -743,9 +676,9 @@ select:focus {
   align-items: center;
   margin-left: 8px;
   padding: 3px 8px;
-  border: 1px solid var(--mono-ink);
+  border: 1px solid rgba(37, 99, 235, 0.35);
   border-radius: 999px;
-  background: var(--mono-ink);
+  background: linear-gradient(135deg, var(--mono-brand), #1d4ed8);
   color: #fff;
   font-size: 0.68rem;
   font-weight: 900;
@@ -849,7 +782,7 @@ select:focus {
   min-height: 44px;
   border: 0;
   border-radius: var(--mono-radius);
-  background: var(--mono-ink);
+  background: linear-gradient(135deg, var(--mono-brand), #1d4ed8);
   color: #fff;
   padding: 0 16px;
   font-weight: 900;
@@ -880,7 +813,7 @@ select:focus {
 }
 
 .admin_user:hover {
-  border-color: var(--mono-ink);
+  border-color: rgba(37, 99, 235, 0.35);
   transform: translateY(-1px);
   box-shadow: var(--mono-shadow-soft);
 }
@@ -1057,7 +990,7 @@ select:focus {
   position: absolute;
   inset: 0 auto 0 0;
   width: 8px;
-  background: var(--mono-ink);
+  background: linear-gradient(180deg, var(--mono-brand), var(--mono-accent));
 }
 
 .premium_card p {
@@ -1084,9 +1017,9 @@ select:focus {
   gap: 8px;
   margin: 24px 0;
   padding: 10px 16px;
-  border: 1px solid var(--mono-ink);
+  border: 1px solid transparent;
   border-radius: 999px;
-  background: var(--mono-ink);
+  background: linear-gradient(135deg, var(--mono-brand), #1d4ed8);
   color: #fff;
   font-size: clamp(2rem, 5vw, 3.6rem);
   font-weight: 950;
@@ -1128,7 +1061,7 @@ select:focus {
   height: 10px;
   flex: 0 0 10px;
   border-radius: 50%;
-  background: var(--mono-ink);
+  background: linear-gradient(135deg, var(--mono-brand), var(--mono-accent));
 }
 
 .premium_actions {
@@ -1139,10 +1072,10 @@ select:focus {
 
 .premium_actions button {
   min-height: 48px;
-  border: 1px solid var(--mono-ink);
+  border: 1px solid rgba(37, 99, 235, 0.35);
   border-radius: var(--mono-radius);
   padding: 0 18px;
-  background: var(--mono-ink);
+  background: linear-gradient(135deg, var(--mono-brand), #1d4ed8);
   color: #fff;
   font-weight: 950;
   transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
@@ -1150,7 +1083,7 @@ select:focus {
 
 .premium_actions button:last-child {
   background: #fff;
-  color: var(--mono-ink);
+  color: var(--mono-brand);
 }
 
 .premium_actions button:hover {
@@ -1264,7 +1197,7 @@ select:focus {
   margin-top: 20px;
   border: 0;
   border-radius: var(--mono-radius);
-  background: var(--mono-ink);
+  background: linear-gradient(135deg, var(--mono-brand), #1d4ed8);
   color: #fff;
   font-weight: 900;
 }

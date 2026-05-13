@@ -15,9 +15,11 @@ const Info = ({id, auth, profile, dispatch}) => {
 
     useEffect(() => {
         if(id === auth.user._id){
+            if (!auth.user) return
             setUserData([auth.user])
         }else{
             const newData = profile.users.filter(user => user._id === id)
+            if (!newData?.[0]) return
             setUserData([newData[0]])
         }
     }, [id, auth, dispatch, profile.users])
@@ -30,7 +32,6 @@ const Info = ({id, auth, profile, dispatch}) => {
             dispatch({ type: GLOBALTYPES.MODAL, payload: false})
         }
     },[showFollowers, showFollowing, onEdit, dispatch])
-    
 
     return (
         <div className="info">
